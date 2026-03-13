@@ -25,3 +25,6 @@ dist-ssr
 
 # Database
 db/dev.sqlite   
+
+# Jupyter Notebook
+.ipynb_checkpoints/
