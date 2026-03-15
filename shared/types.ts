@@ -1,19 +1,22 @@
-export interface GDPData {
-  country: string;
-  year: number;
-  gdp: number;
-}
-
-export interface EconomicHistory {
-  country_code: string;
-  country_name: string;
-  region: string;
-  income: string;
+export interface EconomicHistoryData {
   year: number;
   gdp_growth: number;
   inflation: number;
   life_expectancy: number;
-  poverty: number;
+  poverty: number | null;
 }
 
-export interface EconomicLatest extends EconomicHistory {}
+export interface EconomicHistory {
+  country: string;
+  country_code: string;
+  region: string;
+  income: string;
+  data: EconomicHistoryData[];
+}
+
+export interface EconomicLatest extends EconomicHistoryData {
+  country: string;
+  country_code: string;
+  region: string;
+  income: string;
+}
