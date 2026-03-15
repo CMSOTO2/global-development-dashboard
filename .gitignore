@@ -28,3 +28,7 @@ db/dev.sqlite
 
 # Jupyter Notebook
 .ipynb_checkpoints/
+
+# Raw data (large/generated CSVs)
+data/raw-data/
+data/raw-data/*.csv

@@ -1,4 +1,4 @@
-CREATE TABLE economic_hisory (
+CREATE TABLE economic_history (
   id INTEGER PRIMARY KEY,
   country_code TEXT,
   country_name TEXT,
