@@ -88,8 +88,8 @@ export function GlobalDevelopmentDashboard() {
 
   return (
     <div className="min-w-0">
-      <div className="max-w-6xl mx-auto px-4 py-6 sm:px-6 lg:px-8 min-w-0">
-        <header className="mb-6">
+      <div className="max-w-[1440px] mx-auto px-4 py-6 sm:px-6 lg:px-8 min-w-0">
+        <header className="shrink-0 mb-6">
           <h1 className="text-2xl font-bold text-slate-900 dark:text-zinc-100 tracking-tight">
             Global Development Dashboard
           </h1>
@@ -99,7 +99,7 @@ export function GlobalDevelopmentDashboard() {
         </header>
 
         {/* Controls: metric + filters */}
-        <section className="mb-6 p-4 rounded-xl border border-slate-200/80 dark:border-zinc-700/80 bg-white dark:bg-zinc-900 shadow-sm">
+        <section className="shrink-0 mb-6 p-4 rounded-xl border border-slate-200/80 dark:border-zinc-700/80 bg-white dark:bg-zinc-900 shadow-sm">
           <div className="flex flex-wrap items-center gap-3">
             <span className="text-sm font-medium text-slate-600 dark:text-zinc-400">Metric:</span>
             <select
@@ -166,7 +166,7 @@ export function GlobalDevelopmentDashboard() {
         </section>
 
         {/* Main chart: time series line */}
-        <section className="mb-8 min-w-0">
+        <section className="min-w-0 mb-6" style={{ height: "80vh" }}>
           <VisxLineChart
             series={lineChartSeries}
             title={`${metricConfig.label} Over Time`}
@@ -174,8 +174,8 @@ export function GlobalDevelopmentDashboard() {
           />
         </section>
 
-        {/* Optional: Gapminder-style scatter */}
-        <section className="min-w-0">
+        {/* Gapminder-style scatter */}
+        <section className="min-w-0" style={{ height: "80vh" }}>
           <GapminderScatterChart data={filteredLatest} />
         </section>
       </div>

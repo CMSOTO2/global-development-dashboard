@@ -159,14 +159,12 @@ const InnerGapminderScatter = memo(function InnerGapminderScatter({
   );
 });
 
-const SCATTER_HEIGHT = 380;
-
 export function GapminderScatterChart(props: GapminderScatterChartProps) {
   if (!props.data.length) return null;
   return (
-    <div className="chart-card flex flex-col overflow-hidden min-w-0">
-      <div className="w-full min-w-0 overflow-hidden" style={{ height: SCATTER_HEIGHT, minWidth: 0 }}>
-        <ParentSize debounceTime={120} initialSize={{ width: 800, height: SCATTER_HEIGHT }}>
+    <div className="chart-card flex flex-col overflow-hidden min-w-0 h-full">
+      <div className="w-full min-w-0 overflow-hidden h-full" style={{ height: "100%" }}>
+        <ParentSize debounceTime={120} initialSize={{ width: 800, height: 400 }}>
           {({ width, height }) =>
             width > 0 && height > 0 ? <InnerGapminderScatter {...props} width={width} height={height} /> : null
           }
