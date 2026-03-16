@@ -28,7 +28,9 @@ interface VisxLineChartProps {
 const DEFAULT_MARGIN = { top: 24, right: 24, bottom: 36, left: 56 };
 const NARROW_MARGIN = { top: 20, right: 12, bottom: 28, left: 40 };
 const NARROW_BREAKPOINT = 420;
-const TITLE_AREA_HEIGHT = 40;
+/** Fixed height for title + optional pinned message so layout never shifts */
+const TITLE_BLOCK_HEIGHT = 52;
+const LEGEND_HEIGHT = 44;
 const LINE_COLORS = [
   "#0ea5e9",
   "#8b5cf6",
@@ -71,7 +73,10 @@ const InnerLineChart = memo(function InnerLineChart({
   } = useTooltip<{ series: LineSeries; year: number; value: number }>();
 
   const margin = useMemo(() => getMargin(width), [width]);
-  const chartHeight = height - TITLE_AREA_HEIGHT;
+  const chartHeight = Math.max(
+    120,
+    height - TITLE_BLOCK_HEIGHT - LEGEND_HEIGHT,
+  );
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = chartHeight - margin.top - margin.bottom;
 
@@ -200,18 +205,20 @@ const InnerLineChart = memo(function InnerLineChart({
   return (
     <div className="flex h-full w-full flex-col min-h-0 overflow-hidden">
       <div
-        className="shrink-0 mb-2"
-        style={{ minHeight: TITLE_AREA_HEIGHT - 8 }}
+        className="shrink-0 overflow-hidden"
+        style={{ height: TITLE_BLOCK_HEIGHT }}
       >
-        <h2 className="chart-title">{title}</h2>
-        {pinnedSeries && (
-          <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
-            Showing only {pinnedSeries.countryName} — click chart to show all
-            lines
-          </p>
-        )}
+        <h2 className="chart-title truncate">{title}</h2>
+        <p
+          className="text-xs text-slate-500 dark:text-zinc-400 truncate mt-0.5"
+          style={{ visibility: pinnedSeries ? "visible" : "hidden" }}
+        >
+          {pinnedSeries
+            ? `Showing only ${pinnedSeries.countryName} — click chart to show all lines`
+            : ""}
+        </p>
       </div>
-      <div className="flex-1 min-h-0 relative overflow-hidden">
+      <div className="relative shrink-0" style={{ height: chartHeight }}>
         <svg width={width} height={chartHeight} className="block">
           <Group left={margin.left} top={margin.top}>
             {yScale.ticks(5).map((tick) => (
@@ -340,6 +347,38 @@ const InnerLineChart = memo(function InnerLineChart({
             </div>,
             document.body,
           )}
+      </div>
+      {/* Color legend - outside overflow so it's always visible */}
+      <div
+        className="shrink-0 flex flex-wrap items-center gap-x-4 gap-y-1.5 px-1 pt-2 border-t border-slate-100 dark:border-zinc-800"
+        style={{ minHeight: LEGEND_HEIGHT }}
+      >
+        {visibleSeries.map((s, i) => {
+          const colorIndex = validSeries.findIndex(
+            (vs) => vs.countryCode === s.countryCode,
+          );
+          const color =
+            LINE_COLORS[
+              (colorIndex >= 0 ? colorIndex : i) % LINE_COLORS.length
+            ];
+          const isDimmed =
+            !pinnedCode && hoveredCode != null && hoveredCode !== s.countryCode;
+          return (
+            <span
+              key={s.countryCode}
+              className="inline-flex items-center gap-1.5 text-xs"
+              style={{ opacity: isDimmed ? 0.4 : 1 }}
+            >
+              <span
+                className="inline-block w-4 h-0.5 rounded-full shrink-0"
+                style={{ backgroundColor: color }}
+              />
+              <span className="text-slate-600 dark:text-zinc-400 truncate max-w-[120px]">
+                {s.countryName}
+              </span>
+            </span>
+          );
+        })}
       </div>
     </div>
   );
