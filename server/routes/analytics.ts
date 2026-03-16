@@ -26,8 +26,18 @@ export async function analyticsRoutes(server: FastifyInstance) {
             )
           ) AS data
         FROM (
-          SELECT country, country_code, region, income, year, gdp_growth, inflation, life_expectancy, poverty
+          SELECT
+            country_code,
+            year,
+            MAX(country) AS country,
+            MAX(region) AS region,
+            MAX(income) AS income,
+            MAX(gdp_growth) AS gdp_growth,
+            MAX(inflation) AS inflation,
+            MAX(life_expectancy) AS life_expectancy,
+            MAX(poverty) AS poverty
           FROM economic_history
+          GROUP BY country_code, year
           ORDER BY country_code, year
         )
         GROUP BY country_code
