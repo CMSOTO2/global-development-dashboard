@@ -76,3 +76,33 @@
     stroke-dashoffset: 0;
   }
 }
+
+/* Bubble chart skeleton: pulse + subtle float */
+@keyframes skeleton-bubble-pulse {
+  0%,
+  100% {
+    transform: scale(1) translate(0, 0);
+    opacity: 0.6;
+  }
+  33% {
+    transform: scale(1.08) translate(1.5%, -1%);
+    opacity: 0.9;
+  }
+  66% {
+    transform: scale(1.04) translate(-1%, 1.5%);
+    opacity: 1;
+  }
+}
+
+.skeleton-bubble {
+  animation: skeleton-bubble-pulse 2.5s ease-in-out infinite;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-bubble {
+    animation: none;
+    opacity: 0.8;
+  }
+}

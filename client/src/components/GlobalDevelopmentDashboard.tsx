@@ -8,13 +8,22 @@ import {
   type MetricKey,
 } from "../constants/metrics";
 import { DashboardControls } from "./DashboardControls";
+import { BubbleChartFilters } from "./BubbleChartFilters";
 import { VisxLineChart } from "./charts/VisxLineChart";
 import { GapminderScatterChart } from "./charts/GapminderScatterChart";
-import { ChartSkeleton, ControlsSkeleton, Skeleton } from "./skeletons";
+import {
+  BubbleChartSkeleton,
+  ChartSkeleton,
+  ControlsSkeleton,
+  Skeleton,
+} from "./skeletons";
 
 function getUnique<T>(items: T[], key: (t: T) => string): string[] {
   const set = new Set<string>();
-  for (const item of items) set.add(key(item));
+  for (const item of items) {
+    const v = key(item);
+    if (v != null && typeof v === "string") set.add(v.trim());
+  }
   return Array.from(set).sort();
 }
 
@@ -50,12 +59,34 @@ export function GlobalDevelopmentDashboard() {
 
   const filteredLatest = useMemo(() => {
     if (!latestData) return [];
+    const region = regionFilter.trim();
+    const income = incomeFilter.trim();
     return latestData.filter((row) => {
-      if (regionFilter !== "All" && row.region !== regionFilter) return false;
-      if (incomeFilter !== "All" && row.income !== incomeFilter) return false;
+      if (
+        region !== "" &&
+        region !== "All" &&
+        (row.region ?? "").trim() !== region
+      )
+        return false;
+      if (
+        income !== "" &&
+        income !== "All" &&
+        (row.income ?? "").trim() !== income
+      )
+        return false;
       return true;
     });
   }, [latestData, regionFilter, incomeFilter]);
+
+  /** One row per country for the scatter chart so region/income filters show exactly that set */
+  const scatterData = useMemo(() => {
+    const seen = new Set<string>();
+    return filteredLatest.filter((row) => {
+      if (seen.has(row.country_code)) return false;
+      seen.add(row.country_code);
+      return true;
+    });
+  }, [filteredLatest]);
 
   const countryOptions = useMemo(() => {
     const seen = new Set<string>();
@@ -173,11 +204,22 @@ export function GlobalDevelopmentDashboard() {
 
         {/* Gapminder-style scatter */}
         {isLoading ? (
-          <ChartSkeleton height="80vh" />
+          <BubbleChartSkeleton height="80vh" />
         ) : (
-          <section className="min-w-0" style={{ height: "80vh" }}>
-            <GapminderScatterChart data={filteredLatest} />
-          </section>
+          <>
+            <BubbleChartFilters
+              regionFilter={regionFilter}
+              onRegionFilterChange={setRegionFilter}
+              incomeFilter={incomeFilter}
+              onIncomeFilterChange={setIncomeFilter}
+              regions={regions}
+              incomes={incomes}
+              countryCount={scatterData.length}
+            />
+            <section className="min-w-0" style={{ height: "80vh" }}>
+              <GapminderScatterChart data={scatterData} />
+            </section>
+          </>
         )}
       </div>
     </div>

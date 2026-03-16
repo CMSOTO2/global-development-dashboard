@@ -12,6 +12,10 @@ const DEFAULT_MARGIN = { top: 32, right: 24, bottom: 44, left: 52 };
 const NARROW_MARGIN = { top: 24, right: 12, bottom: 36, left: 40 };
 const NARROW_BREAKPOINT = 420;
 const TITLE_AREA_HEIGHT = 40;
+/** Fixed height for legend below chart so it doesn't overlap x-axis label */
+const LEGEND_HEIGHT = 44;
+const TOOLTIP_OFFSET = 12;
+const TOOLTIP_WIDTH_ESTIMATE = 200;
 
 const REGION_COLORS: Record<string, string> = {
   "East Asia & Pacific": "#0ea5e9",
@@ -51,12 +55,20 @@ const InnerGapminderScatter = memo(function InnerGapminderScatter({
   const { tooltipData, tooltipLeft, tooltipTop, tooltipOpen, showTooltip, hideTooltip } =
     useTooltip<EconomicLatest>();
 
+  const hoveredRegion = tooltipOpen && tooltipData ? tooltipData.region : null;
+
   const margin = useMemo(() => getMargin(width), [width]);
-  const chartHeight = height - TITLE_AREA_HEIGHT;
+  const chartHeight = Math.max(120, height - TITLE_AREA_HEIGHT - LEGEND_HEIGHT);
   const innerWidth = width - margin.left - margin.right;
   const innerHeight = chartHeight - margin.top - margin.bottom;
 
+  const regionsInData = useMemo(
+    () => [...new Set(valid.map((d) => d.region).filter(Boolean))].sort(),
+    [valid],
+  );
+
   const xExtent = useMemo(() => {
+    if (valid.length === 0) return [-2, 10] as [number, number];
     const xs = valid.map((d) => d.gdp_growth);
     const lo = Math.min(...xs);
     const hi = Math.max(...xs);
@@ -65,6 +77,7 @@ const InnerGapminderScatter = memo(function InnerGapminderScatter({
   }, [valid]);
 
   const yExtent = useMemo(() => {
+    if (valid.length === 0) return [50, 85] as [number, number];
     const ys = valid.map((d) => d.life_expectancy);
     const lo = Math.min(...ys);
     const hi = Math.max(...ys);
@@ -87,7 +100,7 @@ const InnerGapminderScatter = memo(function InnerGapminderScatter({
     return scaleLinear<number>({ domain: [pMin, pMax], range: [4, 24], round: true });
   }, [povertyExtent]);
 
-  if (valid.length === 0 || width < 300 || chartHeight < 10) return null;
+  if (width < 300 || chartHeight < 10) return null;
 
   return (
     <div className="flex h-full w-full flex-col min-h-0 overflow-hidden">
@@ -97,27 +110,28 @@ const InnerGapminderScatter = memo(function InnerGapminderScatter({
       <div className="flex-1 min-h-0 relative overflow-hidden">
         <svg width={width} height={chartHeight} className="block">
           <Group left={margin.left} top={margin.top}>
-            {valid.map((d) => {
-              const r = d.poverty != null && Number.isFinite(d.poverty) ? radiusScale(d.poverty) : 8;
-              const color = REGION_COLORS[d.region] ?? REGION_COLORS["Other"];
-              return (
-                <circle
-                  key={d.country_code}
-                  cx={xScale(d.gdp_growth)}
-                  cy={yScale(d.life_expectancy)}
-                  r={r}
-                  fill={color}
-                  fillOpacity={0.75}
-                  stroke="white"
-                  strokeWidth={1.5}
-                  className="dark:stroke-zinc-800"
-                  style={{ cursor: "pointer" }}
-                  onMouseEnter={(e) => showTooltip({ tooltipData: d, tooltipLeft: e.clientX, tooltipTop: e.clientY })}
-                  onMouseMove={(e) => showTooltip({ tooltipData: d, tooltipLeft: e.clientX, tooltipTop: e.clientY })}
-                  onMouseLeave={hideTooltip}
-                />
-              );
-            })}
+            {valid.length > 0 &&
+              valid.map((d) => {
+                const r = d.poverty != null && Number.isFinite(d.poverty) ? radiusScale(d.poverty) : 8;
+                const color = REGION_COLORS[d.region] ?? REGION_COLORS["Other"];
+                return (
+                  <circle
+                    key={d.country_code}
+                    cx={xScale(d.gdp_growth)}
+                    cy={yScale(d.life_expectancy)}
+                    r={r}
+                    fill={color}
+                    fillOpacity={0.75}
+                    stroke="white"
+                    strokeWidth={1.5}
+                    className="dark:stroke-zinc-800"
+                    style={{ cursor: "pointer" }}
+                    onMouseEnter={(e) => showTooltip({ tooltipData: d, tooltipLeft: e.clientX, tooltipTop: e.clientY })}
+                    onMouseMove={(e) => showTooltip({ tooltipData: d, tooltipLeft: e.clientX, tooltipTop: e.clientY })}
+                    onMouseLeave={hideTooltip}
+                  />
+                );
+              })}
             <line x1={0} x2={innerWidth} y1={innerHeight} y2={innerHeight} stroke="currentColor" strokeOpacity={0.4} className="text-slate-400 dark:text-zinc-500" />
             <line x1={0} x2={0} y1={0} y2={innerHeight} stroke="currentColor" strokeOpacity={0.4} className="text-slate-400 dark:text-zinc-500" />
             {xScale.ticks(5).map((tick) => (
@@ -130,22 +144,25 @@ const InnerGapminderScatter = memo(function InnerGapminderScatter({
             <text transform={`rotate(-90) translate(${-innerHeight / 2}, -${margin.left + 14})`} textAnchor="middle" fontSize={11} className="fill-slate-500 dark:fill-zinc-400 font-medium">Life Expectancy (years)</text>
           </Group>
         </svg>
-        <div className="absolute bottom-2 right-2 flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-slate-500 dark:text-zinc-400">
-          {Object.entries(REGION_COLORS).map(([region, color]) => (
-            <span key={region} className="flex items-center gap-1">
-              <span className="inline-block w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
-              {region}
-            </span>
-          ))}
-        </div>
         {tooltipOpen && tooltipData &&
           createPortal(
             <div
               className="rounded-lg border border-slate-200 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-800 px-3 py-2 shadow-lg"
-              style={{ position: "fixed", left: (tooltipLeft ?? 0) + 12, top: (tooltipTop ?? 0) + 12, zIndex: 1000, pointerEvents: "none" }}
+              style={{
+                position: "fixed",
+                left:
+                  (tooltipLeft ?? 0) + TOOLTIP_OFFSET + TOOLTIP_WIDTH_ESTIMATE > (typeof window !== "undefined" ? window.innerWidth : 1024)
+                    ? (tooltipLeft ?? 0) - TOOLTIP_WIDTH_ESTIMATE - TOOLTIP_OFFSET
+                    : (tooltipLeft ?? 0) + TOOLTIP_OFFSET,
+                top: (tooltipTop ?? 0) + TOOLTIP_OFFSET,
+                zIndex: 1000,
+                pointerEvents: "none",
+              }}
             >
-              <div className="text-slate-800 dark:text-zinc-100 font-semibold text-sm">{tooltipData.country}</div>
-              <div className="text-slate-600 dark:text-zinc-400 text-xs mt-1 space-y-0.5">
+              <div className="text-slate-800 dark:text-zinc-100 font-semibold text-sm">
+                {tooltipData.country}
+              </div>
+              <div className="text-slate-600 dark:text-zinc-400 text-xs mt-0.5 space-y-0.5">
                 <div>GDP Growth: {tooltipData.gdp_growth?.toFixed(1)}%</div>
                 <div>Life Expectancy: {tooltipData.life_expectancy?.toFixed(0)} yrs</div>
                 <div>Poverty: {tooltipData.poverty != null ? `${tooltipData.poverty.toFixed(1)}%` : "—"}</div>
@@ -155,12 +172,34 @@ const InnerGapminderScatter = memo(function InnerGapminderScatter({
             document.body,
           )}
       </div>
+      {/* Legend below chart — highlight only the hovered bubble's region */}
+      <div
+        className="shrink-0 flex flex-wrap items-center gap-x-4 gap-y-1.5 px-1 pt-2 border-t border-slate-100 dark:border-zinc-800"
+        style={{ minHeight: LEGEND_HEIGHT }}
+      >
+        {(regionsInData.length > 0 ? regionsInData : Object.keys(REGION_COLORS)).map((region) => {
+          const color = REGION_COLORS[region] ?? REGION_COLORS["Other"];
+          const isHighlighted = hoveredRegion == null || region === hoveredRegion;
+          return (
+            <span
+              key={region}
+              className="inline-flex items-center gap-1.5 text-xs text-slate-600 dark:text-zinc-400 transition-opacity duration-150"
+              style={{ opacity: isHighlighted ? 1 : 0.4 }}
+            >
+              <span
+                className="inline-block w-3 h-3 rounded-full shrink-0"
+                style={{ backgroundColor: color }}
+              />
+              <span className="truncate max-w-[140px]">{region}</span>
+            </span>
+          );
+        })}
+      </div>
     </div>
   );
 });
 
 export function GapminderScatterChart(props: GapminderScatterChartProps) {
-  if (!props.data.length) return null;
   return (
     <div className="chart-card flex flex-col overflow-hidden min-w-0 h-full">
       <div className="w-full min-w-0 overflow-hidden h-full" style={{ height: "100%" }}>

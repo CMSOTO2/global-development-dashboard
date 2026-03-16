@@ -1,5 +1,23 @@
-import { useId } from "react";
 import { Skeleton } from "./Skeleton";
+
+/** Same palette as bubble chart skeleton for consistent look */
+const LINE_SKELETON_COLORS = [
+  "#0ea5e9", // sky
+  "#8b5cf6", // violet
+  "#10b981", // emerald
+  "#f59e0b", // amber
+  "#ef4444", // red
+  "#ec4899", // pink
+  "#06b6d4", // cyan
+  "#64748b", // slate
+];
+
+const FAKE_LINE_PATHS = [
+  "M 10 85 Q 30 70 50 55 T 90 25",
+  "M 10 75 Q 35 65 55 50 T 90 35",
+  "M 10 90 Q 40 80 60 60 T 90 45",
+  "M 10 78 Q 38 62 58 48 T 90 28",
+];
 
 interface ChartSkeletonProps {
   /** Height of the whole block (e.g. "80vh") */
@@ -11,7 +29,6 @@ export function ChartSkeleton({
   height = "80vh",
   className = "",
 }: ChartSkeletonProps) {
-  const gradientId = useId().replace(/:/g, "-");
   return (
     <section
       className={`min-w-0 ${className}`.trim()}
@@ -25,7 +42,7 @@ export function ChartSkeleton({
           <Skeleton className="h-4 w-20 ml-auto" />
         </div>
 
-        {/* Chart area with fake axes and lines */}
+        {/* Chart area with fake axes and colored lines */}
         <div className="flex-1 min-h-0 relative rounded-lg overflow-hidden bg-slate-100/50 dark:bg-zinc-800/50">
           <svg
             className="w-full h-full text-slate-200 dark:text-zinc-600"
@@ -33,17 +50,6 @@ export function ChartSkeleton({
             preserveAspectRatio="none"
             aria-hidden
           >
-            <defs>
-              <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="currentColor" stopOpacity="0.2" />
-                <stop offset="50%" stopColor="currentColor" stopOpacity="0.5" />
-                <stop
-                  offset="100%"
-                  stopColor="currentColor"
-                  stopOpacity="0.2"
-                />
-              </linearGradient>
-            </defs>
             {/* Y axis */}
             <line
               x1={8}
@@ -64,50 +70,21 @@ export function ChartSkeleton({
               strokeWidth="0.5"
               strokeOpacity="0.4"
             />
-            {/* Animated trend lines (draw then reset) — path coords must be numbers, not % */}
-            <path
-              className="skeleton-chart-line"
-              pathLength={1}
-              d="M 10 85 Q 30 70 50 55 T 90 25"
-              fill="none"
-              stroke={`url(#${gradientId})`}
-              strokeWidth="1.2"
-              strokeLinecap="round"
-              style={{ animationDelay: "0s" }}
-            />
-            <path
-              className="skeleton-chart-line"
-              pathLength={1}
-              d="M 10 75 Q 35 65 55 50 T 90 35"
-              fill="none"
-              stroke={`url(#${gradientId})`}
-              strokeWidth="1.2"
-              strokeLinecap="round"
-              opacity="0.85"
-              style={{ animationDelay: "0.35s" }}
-            />
-            <path
-              className="skeleton-chart-line"
-              pathLength={1}
-              d="M 10 90 Q 40 80 60 60 T 90 45"
-              fill="none"
-              stroke={`url(#${gradientId})`}
-              strokeWidth="1.2"
-              strokeLinecap="round"
-              opacity="0.7"
-              style={{ animationDelay: "0.7s" }}
-            />
-            <path
-              className="skeleton-chart-line"
-              pathLength={1}
-              d="M 10 78 Q 38 62 58 48 T 90 28"
-              fill="none"
-              stroke={`url(#${gradientId})`}
-              strokeWidth="1.2"
-              strokeLinecap="round"
-              opacity="0.55"
-              style={{ animationDelay: "1.05s" }}
-            />
+            {/* Animated trend lines — one color per line, same palette as bubble skeleton */}
+            {FAKE_LINE_PATHS.map((d, i) => (
+              <path
+                key={i}
+                className="skeleton-chart-line"
+                pathLength={1}
+                d={d}
+                fill="none"
+                stroke={LINE_SKELETON_COLORS[i % LINE_SKELETON_COLORS.length]}
+                strokeWidth="1.2"
+                strokeLinecap="round"
+                opacity={0.85 - i * 0.05}
+                style={{ animationDelay: `${i * 0.35}s` }}
+              />
+            ))}
           </svg>
           {/* Shimmer overlay on the chart area */}
           <div
