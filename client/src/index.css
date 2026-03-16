@@ -5,10 +5,74 @@
 
 /* Chart cards and axes */
 .chart-card {
-  @apply rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm transition-[color,box-shadow] duration-200 hover:shadow-md;
+  @apply rounded-xl border border-slate-200/60 bg-slate-50 p-5 shadow-sm transition-[color,box-shadow] duration-200 hover:shadow-md;
   @apply dark:border-zinc-700/80 dark:bg-zinc-900 dark:hover:shadow-none dark:shadow-black/20;
 }
 
 .chart-title {
   @apply text-base font-semibold text-slate-800 mb-3 dark:text-zinc-100;
+}
+
+/* Skeleton loaders */
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  @apply rounded-md bg-slate-200/80 dark:bg-zinc-700/60;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+.dark .skeleton {
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 100%
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+    background-image: none;
+  }
+}
+
+/* Skeleton chart lines: draw then reset */
+@keyframes skeleton-line-draw {
+  0% {
+    stroke-dashoffset: 1;
+  }
+  35% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: 1;
+  }
+}
+
+.skeleton-chart-line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: skeleton-line-draw 2.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-chart-line {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
 }

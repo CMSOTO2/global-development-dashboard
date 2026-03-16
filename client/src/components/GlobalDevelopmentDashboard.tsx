@@ -10,6 +10,7 @@ import {
 import { DashboardControls } from "./DashboardControls";
 import { VisxLineChart } from "./charts/VisxLineChart";
 import { GapminderScatterChart } from "./charts/GapminderScatterChart";
+import { ChartSkeleton, ControlsSkeleton, Skeleton } from "./skeletons";
 
 function getUnique<T>(items: T[], key: (t: T) => string): string[] {
   const set = new Set<string>();
@@ -108,10 +109,6 @@ export function GlobalDevelopmentDashboard() {
   const isLoading = historyLoading || latestLoading;
   const error = historyError ?? latestError;
 
-  if (isLoading)
-    return (
-      <div className="p-8 text-slate-600 dark:text-zinc-400">Loading...</div>
-    );
   if (error)
     return (
       <div className="p-8 text-red-600 dark:text-red-400">
@@ -123,44 +120,65 @@ export function GlobalDevelopmentDashboard() {
     <div className="min-w-0">
       <div className="max-w-[1440px] mx-auto px-4 py-6 sm:px-6 lg:px-8 min-w-0">
         <header className="shrink-0 mb-6">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-zinc-100 tracking-tight">
-            Global Development Dashboard
-          </h1>
-          <p className="mt-1 text-slate-500 dark:text-zinc-400 text-sm">
-            Time series by country. Switch metric, filter by region/income, and
-            add or remove countries via search. Max {MAX_VISIBLE_LINES} lines at
-            once.
-          </p>
+          {isLoading ? (
+            <>
+              <Skeleton className="h-8 w-72 mb-2" />
+              <Skeleton className="h-4 w-full max-w-md" />
+            </>
+          ) : (
+            <>
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-zinc-100 tracking-tight">
+                Global Development Dashboard
+              </h1>
+              <p className="mt-1 text-slate-500 dark:text-zinc-400 text-sm">
+                Time series by country. Switch metric, filter by region/income,
+                and add or remove countries via search. Max {MAX_VISIBLE_LINES}{" "}
+                lines at once.
+              </p>
+            </>
+          )}
         </header>
 
-        <DashboardControls
-          metric={metric}
-          onMetricChange={setMetric}
-          regionFilter={regionFilter}
-          onRegionFilterChange={setRegionFilter}
-          incomeFilter={incomeFilter}
-          onIncomeFilterChange={setIncomeFilter}
-          selectedCountryCodes={selectedCountryCodes}
-          onAddCountry={addCountry}
-          onRemoveCountry={removeCountry}
-          regions={regions}
-          incomes={incomes}
-          countryOptions={countryOptions}
-        />
+        {isLoading ? (
+          <ControlsSkeleton />
+        ) : (
+          <DashboardControls
+            metric={metric}
+            onMetricChange={setMetric}
+            regionFilter={regionFilter}
+            onRegionFilterChange={setRegionFilter}
+            incomeFilter={incomeFilter}
+            onIncomeFilterChange={setIncomeFilter}
+            selectedCountryCodes={selectedCountryCodes}
+            onAddCountry={addCountry}
+            onRemoveCountry={removeCountry}
+            regions={regions}
+            incomes={incomes}
+            countryOptions={countryOptions}
+          />
+        )}
 
         {/* Main chart: time series line */}
-        <section className="min-w-0 mb-6" style={{ height: "80vh" }}>
-          <VisxLineChart
-            series={lineChartSeries}
-            title={`${metricConfig.label} Over Time`}
-            valueFormat={metricConfig.format}
-          />
-        </section>
+        {isLoading ? (
+          <ChartSkeleton height="80vh" className="mb-6" />
+        ) : (
+          <section className="min-w-0 mb-6" style={{ height: "80vh" }}>
+            <VisxLineChart
+              series={lineChartSeries}
+              title={`${metricConfig.label} Over Time`}
+              valueFormat={metricConfig.format}
+            />
+          </section>
+        )}
 
         {/* Gapminder-style scatter */}
-        <section className="min-w-0" style={{ height: "80vh" }}>
-          <GapminderScatterChart data={filteredLatest} />
-        </section>
+        {isLoading ? (
+          <ChartSkeleton height="80vh" />
+        ) : (
+          <section className="min-w-0" style={{ height: "80vh" }}>
+            <GapminderScatterChart data={filteredLatest} />
+          </section>
+        )}
       </div>
     </div>
   );

@@ -244,7 +244,7 @@ const InnerScatterChart = memo(function InnerScatterChart({
           tooltipData &&
           createPortal(
             <div
-              className="chart-tooltip rounded-lg border border-slate-200 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 shadow-lg"
+              className="chart-tooltip rounded-lg border border-slate-200 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-800 px-3 py-2 shadow-lg"
               style={{
                 position: "fixed",
                 left: (tooltipLeft ?? 0) + 12,

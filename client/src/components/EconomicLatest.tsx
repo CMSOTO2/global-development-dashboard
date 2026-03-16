@@ -85,7 +85,7 @@ export const EconomicLatest = () => {
     );
 
   return (
-    <div className="bg-linear-to-b from-slate-50 to-white dark:from-zinc-950 dark:to-zinc-900/50 transition-colors min-w-0">
+    <div className="bg-linear-to-b from-slate-100 to-slate-50 dark:from-zinc-950 dark:to-zinc-900/50 transition-colors min-w-0">
       <div className="max-w-[1440px] mx-auto px-4 py-8 sm:px-6 lg:px-8 min-w-0">
         <header className="mb-10">
           <h1 className="text-3xl font-bold text-slate-900 dark:text-zinc-100 tracking-tight">
