@@ -11,6 +11,8 @@ export interface EconomicHistory {
   country_code: string;
   region: string;
   income: string;
+  latitude: number;
+  longitude: number;
   data: EconomicHistoryData[];
 }
 
@@ -19,4 +21,6 @@ export interface EconomicLatest extends EconomicHistoryData {
   country_code: string;
   region: string;
   income: string;
+  latitude: number;
+  longitude: number;
 }
