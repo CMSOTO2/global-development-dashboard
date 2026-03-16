@@ -8,7 +8,7 @@ import {
   type MetricKey,
 } from "../constants/metrics";
 import type { LineSeries } from "../components/charts/VisxLineChart";
-import type { EconomicLatest } from "../../../shared/types";
+import type { EconomicLatest, EconomicHistory } from "../../../shared/types";
 
 function getUnique<T>(items: T[], key: (t: T) => string): string[] {
   const set = new Set<string>();
@@ -34,6 +34,7 @@ export interface UseDashboardDataResult {
   countryOptions: { code: string; name: string }[];
   lineChartSeries: LineSeries[];
   scatterData: EconomicLatest[];
+  historyData: EconomicHistory[] | undefined;
   metricConfig: (typeof METRICS)[number];
   isLoading: boolean;
   error: Error | null;
@@ -166,6 +167,7 @@ export function useDashboardData(): UseDashboardDataResult {
     countryOptions,
     lineChartSeries,
     scatterData,
+    historyData,
     metricConfig,
     isLoading,
     error,

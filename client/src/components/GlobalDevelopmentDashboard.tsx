@@ -3,6 +3,7 @@ import { DashboardControls } from "./DashboardControls";
 import { BubbleChartFilters } from "./BubbleChartFilters";
 import { VisxLineChart } from "./charts/VisxLineChart";
 import { GapminderScatterChart } from "./charts/GapminderScatterChart";
+import { GeoMercatorChart } from "./charts/GeoMercatorChart";
 import {
   BubbleChartSkeleton,
   ChartSkeleton,
@@ -26,6 +27,7 @@ export function GlobalDevelopmentDashboard() {
     countryOptions,
     lineChartSeries,
     scatterData,
+    historyData,
     metricConfig,
     isLoading,
     error,
@@ -87,10 +89,16 @@ export function GlobalDevelopmentDashboard() {
               incomes={incomes}
               countryCount={scatterData.length}
             />
-            <section className="min-w-0" style={{ height: "80vh" }}>
+            <section className="min-w-0 mb-6" style={{ height: "80vh" }}>
               <GapminderScatterChart data={scatterData} />
             </section>
           </>
+        )}
+
+        {!isLoading && (
+          <section className="min-w-0 mb-6" style={{ height: "80vh" }}>
+            <GeoMercatorChart historyData={historyData} />
+          </section>
         )}
       </div>
     </div>
