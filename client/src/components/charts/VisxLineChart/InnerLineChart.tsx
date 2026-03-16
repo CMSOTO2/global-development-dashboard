@@ -1,59 +1,23 @@
 "use client";
 
 import { memo, useMemo, useState, useCallback, useRef } from "react";
-import { createPortal } from "react-dom";
-import { ParentSize } from "@visx/responsive";
 import { Group } from "@visx/group";
 import { LinePath } from "@visx/shape";
 import { scaleLinear } from "@visx/scale";
 import { useTooltip } from "@visx/tooltip";
+import {
+  type LineSeries,
+  type LineSeriesPoint,
+  getMargin,
+  TITLE_BLOCK_HEIGHT,
+  LEGEND_HEIGHT,
+  LINE_COLORS,
+} from "./constants";
+import { LineChartTooltip } from "./LineChartTooltip";
+import { LineChartLegend } from "./LineChartLegend";
+import type { VisxLineChartProps } from "./constants";
 
-export interface LineSeriesPoint {
-  year: number;
-  value: number;
-}
-
-export interface LineSeries {
-  countryCode: string;
-  countryName: string;
-  points: LineSeriesPoint[];
-}
-
-interface VisxLineChartProps {
-  series: LineSeries[];
-  title: string;
-  valueFormat: (n: number) => string;
-}
-
-const DEFAULT_MARGIN = { top: 24, right: 24, bottom: 36, left: 56 };
-const NARROW_MARGIN = { top: 20, right: 12, bottom: 28, left: 40 };
-const NARROW_BREAKPOINT = 420;
-/** Fixed height for title + optional pinned message so layout never shifts */
-const TITLE_BLOCK_HEIGHT = 52;
-const LEGEND_HEIGHT = 44;
-const LINE_COLORS = [
-  "#0ea5e9",
-  "#8b5cf6",
-  "#10b981",
-  "#f59e0b",
-  "#ef4444",
-  "#ec4899",
-  "#06b6d4",
-  "#84cc16",
-  "#f97316",
-  "#6366f1",
-  "#14b8a6",
-  "#a855f7",
-  "#eab308",
-  "#22c55e",
-  "#3b82f6",
-];
-
-function getMargin(width: number) {
-  return width >= NARROW_BREAKPOINT ? DEFAULT_MARGIN : NARROW_MARGIN;
-}
-
-const InnerLineChart = memo(function InnerLineChart({
+export const InnerLineChart = memo(function InnerLineChart({
   width,
   height,
   series,
@@ -254,7 +218,8 @@ const InnerLineChart = memo(function InnerLineChart({
                   (colorIndex >= 0 ? colorIndex : i) % LINE_COLORS.length
                 ];
               const isHovered = hoveredCode === s.countryCode;
-              const isDimmed = !pinnedCode && hoveredCode != null && !isHovered;
+              const isDimmed =
+                !pinnedCode && hoveredCode != null && !isHovered;
               const opacity = isDimmed ? 0.2 : 1;
               const strokeWidth = isHovered || pinnedCode ? 2.5 : 1.5;
               return (
@@ -325,84 +290,21 @@ const InnerLineChart = memo(function InnerLineChart({
             ))}
           </Group>
         </svg>
-        {tooltipOpen &&
-          tooltipData &&
-          createPortal(
-            <div
-              className="rounded-lg border border-slate-200 dark:border-zinc-600 bg-slate-50 dark:bg-zinc-800 px-3 py-2 shadow-lg"
-              style={{
-                position: "fixed",
-                left: (tooltipLeft ?? 0) + 12,
-                top: (tooltipTop ?? 0) + 12,
-                zIndex: 1000,
-                pointerEvents: "none",
-              }}
-            >
-              <div className="text-slate-800 dark:text-zinc-100 font-semibold text-sm">
-                {tooltipData.series.countryName}
-              </div>
-              <div className="text-slate-600 dark:text-zinc-400 text-xs mt-0.5">
-                {tooltipData.year}: {valueFormat(tooltipData.value)}
-              </div>
-            </div>,
-            document.body,
-          )}
+        {tooltipOpen && tooltipData && (
+          <LineChartTooltip
+            tooltipData={tooltipData}
+            tooltipLeft={tooltipLeft}
+            tooltipTop={tooltipTop}
+            valueFormat={valueFormat}
+          />
+        )}
       </div>
-      {/* Color legend - outside overflow so it's always visible */}
-      <div
-        className="shrink-0 flex flex-wrap items-center gap-x-4 gap-y-1.5 px-1 pt-2 border-t border-slate-100 dark:border-zinc-800"
-        style={{ minHeight: LEGEND_HEIGHT }}
-      >
-        {visibleSeries.map((s, i) => {
-          const colorIndex = validSeries.findIndex(
-            (vs) => vs.countryCode === s.countryCode,
-          );
-          const color =
-            LINE_COLORS[
-              (colorIndex >= 0 ? colorIndex : i) % LINE_COLORS.length
-            ];
-          const isDimmed =
-            !pinnedCode && hoveredCode != null && hoveredCode !== s.countryCode;
-          return (
-            <span
-              key={s.countryCode}
-              className="inline-flex items-center gap-1.5 text-xs"
-              style={{ opacity: isDimmed ? 0.4 : 1 }}
-            >
-              <span
-                className="inline-block w-4 h-0.5 rounded-full shrink-0"
-                style={{ backgroundColor: color }}
-              />
-              <span className="text-slate-600 dark:text-zinc-400 truncate max-w-[120px]">
-                {s.countryName}
-              </span>
-            </span>
-          );
-        })}
-      </div>
+      <LineChartLegend
+        visibleSeries={visibleSeries}
+        validSeries={validSeries}
+        hoveredCode={hoveredCode}
+        pinnedCode={pinnedCode}
+      />
     </div>
   );
 });
-
-export function VisxLineChart(props: VisxLineChartProps) {
-  if (!props.series.length) return null;
-  return (
-    <div className="chart-card flex flex-col overflow-hidden min-w-0 h-full">
-      <div
-        className="w-full min-w-0 overflow-hidden h-full"
-        style={{ height: "100%" }}
-      >
-        <ParentSize
-          debounceTime={120}
-          initialSize={{ width: 800, height: 400 }}
-        >
-          {({ width, height }) =>
-            width > 0 && height > 0 ? (
-              <InnerLineChart {...props} width={width} height={height} />
-            ) : null
-          }
-        </ParentSize>
-      </div>
-    </div>
-  );
-}

@@ -3,6 +3,13 @@
 /* Class-based dark mode (toggle) */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Base typography */
+:root {
+  font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 /* Chart cards and axes */
 .chart-card {
   @apply rounded-xl border border-slate-200/60 bg-slate-50 p-5 shadow-sm transition-[color,box-shadow] duration-200 hover:shadow-md;
@@ -10,7 +17,8 @@
 }
 
 .chart-title {
-  @apply text-base font-semibold text-slate-800 mb-3 dark:text-zinc-100;
+  @apply text-[0.9375rem] font-semibold tracking-tight text-slate-800 mb-3 dark:text-zinc-100;
+  letter-spacing: -0.01em;
 }
 
 /* Skeleton loaders */
