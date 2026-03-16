@@ -1,1 +1,14 @@
 @import "tailwindcss";
+
+/* Class-based dark mode (toggle) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Chart cards and axes */
+.chart-card {
+  @apply rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm transition-[color,box-shadow] duration-200 hover:shadow-md;
+  @apply dark:border-zinc-700/80 dark:bg-zinc-900 dark:hover:shadow-none dark:shadow-black/20;
+}
+
+.chart-title {
+  @apply text-base font-semibold text-slate-800 mb-3 dark:text-zinc-100;
+}
