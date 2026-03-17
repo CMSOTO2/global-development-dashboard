@@ -1,0 +1,10 @@
+# Railway monorepo: single service (server serves API + static client)
+# Root directory: . (repo root)
+
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "npm start"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 10

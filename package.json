@@ -1,0 +1,11 @@
+{
+  "name": "global-development-dashboard",
+  "private": true,
+  "scripts": {
+    "build": "npm install --prefix client && npm run build --prefix client && npm install --prefix server",
+    "start": "npm run start --prefix server"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
