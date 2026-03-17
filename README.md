@@ -1,148 +1,47 @@
 # Global Development Dashboard
 
-A full-stack data analytics platform for exploring global development indicators such as GDP, inflation, poverty rate, and life expectancy.
-
-Global Development Dashboard combines **data science, backend APIs, and interactive visualizations** to transform raw economic datasets into an intuitive analytics dashboard.
-
-The project demonstrates how a modern data product is built end-to-end: data processing, API development, and frontend visualization.
+A full-stack data analytics platform for exploring global development indicators: GDP growth, inflation, life expectancy, poverty, and population. Raw economic data is processed in a data-science pipeline, stored in SQLite, and served via a REST API; a React dashboard consumes the API and visualizes the data with interactive charts and a world map.
 
 ---
 
-## Features
+## Purpose
 
-- Interactive dashboards for macroeconomic indicators
-- Visualization of global trends over time
-- Country-level comparisons
-- Clean API for accessing processed data
-- Reproducible data science pipeline
-- Monorepo architecture combining data science, backend, and frontend
+This project turns raw economic datasets into an explorable dashboard so users can compare countries and regions and inspect trends over time. It demonstrates an end-to-end data product: data processing, backend API, and frontend visualization in a single repo.
 
 ---
 
-## Tech Stack
+## Tech Stack (high level)
 
-### Frontend
+- **Client:** React, TypeScript, Vite, Tailwind CSS, TanStack Query, and Visx (plus topojson/d3-geo for the map). The UI is a SPA that talks to the analytics API and renders line charts, bar chart, scatter chart, and a geo Mercator map.
+- **Server:** Node.js, Fastify, and better-sqlite3. The API serves economic history (per-country time series) and latest snapshots from SQLite; in production the same server also serves the built client.
+- **Data:** SQLite database (schema and dev DB under `db/`). A Python/Jupyter pipeline in `data/notebooks/` cleans and prepares data before it is loaded into the DB.
+- **Shared:** TypeScript types in `shared/` are used by both client and server for API contracts.
 
-- React
-- TypeScript
-- Data visualization libraries for charts and dashboards
+For per-package details, setup, and scripts:
 
-### Backend
-
-- Fastify
-- REST API endpoints for analytics data
-
-### Data Science
-
-- Python
-- Jupyter Notebook
-- Data cleaning and feature engineering scripts
-
-### Version Control
-
-- Git
-- GitHub pull request workflow
+- [client/README.md](client/README.md) — frontend stack, structure, and scripts
+- [server/README.md](server/README.md) — backend stack, routes, and environment
 
 ---
 
-## Data Sources
+## Project structure
 
-The dataset includes global development indicators such as:
-
-- GDP
-- Inflation
-- Poverty rate
-- Life expectancy
-
-Data is processed and normalized in the data science pipeline before being exposed through API endpoints.
-
-Potential sources include organizations such as:
-
-- World Bank
-- International Monetary Fund
-- United Nations
-
----
-
-## Architecture
-
-Raw Dataset
-↓
-Python Data Processing
-↓
-Processed Dataset (JSON / CSV)
-↓
-Fastify Backend API
-↓
-React Dashboard
-
-The data science pipeline transforms raw economic datasets into structured outputs consumed by the backend API. The frontend dashboard then visualizes the data through charts and interactive components.
-
----
-
-## Project Structure
-
+```
 global-development-dashboard/
-│
-├── client/ # React dashboard
-│
-├── server/ # Fastify backend API
-│
-├── data-science/ # notebooks and data pipelines
-│
-├── shared/ # shared types/interfaces
-│
+├── client/          # React dashboard (see client/README.md)
+├── server/          # Fastify API + static serve (see server/README.md)
+├── db/              # SQLite schema and dev database
+├── data/            # Raw data and notebooks (cleaning pipeline)
+├── shared/          # Shared TypeScript types
 └── README.md
+```
 
 ---
 
-## Example API Endpoints
+## Running the project
 
-GET /analytics/gdp
-GET /analytics/inflation
-GET /analytics/life-expectancy
-GET /analytics/poverty-rate
-GET /analytics/country/:countryCode
+1. **Database:** Ensure `db/dev.sqlite` exists and matches `db/schema.sql` (run migrations or load data as needed).
+2. **Server:** From `server/`, run `npm install` and `npm run dev`. API and (if built) client are served at `http://localhost:3000`.
+3. **Client (dev):** From `client/`, run `npm install` and `npm run dev`. Set `VITE_API_BASE_URL=http://localhost:3000` if the API runs on port 3000. Build with `npm run build`; the output in `client/dist/` is what the server serves in production.
 
----
-
-## Running the Project
-
-### 1. Clone the repository
-
-git clone <https://github.com/yourusername/global-development-dashboard.git>
-
-### 2. Install dependencies
-
-npm install
-
-### 3. Start the development servers
-
-### 4. Run the data pipeline
-
-cd data-science
-pip install -r requirements.txt
-python scripts/process_data.py
-
----
-
-## Goals of the Project
-
-This project aims to demonstrate:
-
-- building a full-stack data product
-- integrating data science workflows with production APIs
-- designing interactive data visualizations
-- structuring a professional monorepo
-
----
-
-## Future Improvements
-
-- predictive models for economic indicators
-- more datasets and indicators
-- advanced visualizations
-- caching layer for faster analytics queries
-- automated data refresh pipeline
-
----
+See [client/README.md](client/README.md) and [server/README.md](server/README.md) for exact scripts and environment variables.

@@ -1,73 +1,29 @@
-# React + TypeScript + Vite
+# Global Development Dashboard – Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend for the global development dashboard. A React SPA that fetches economic data from the server and visualizes it with charts and a map.
 
-Currently, two official plugins are available:
+## Tech
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Build:** **Vite** (v7) with **@vitejs/plugin-react**. TypeScript is compiled by Vite; the app uses ESM and `import.meta.env` for config.
+- **UI:** **React** 18 with **TypeScript**. Styling with **Tailwind CSS** (v4, via `@tailwindcss/vite`).
+- **Data:** **TanStack Query (React Query)** for fetching and caching server data. API base URL is driven by `VITE_API_BASE_URL` (see below).
+- **Charts and map:** **Visx** (axis, geo, scale, shape, tooltip, responsive) for line charts, bar chart, scatter (Gapminder-style) and a geo Mercator map; **topojson-client** and **d3-geo** for world topology and projection. Shared types for economic data live in the repo `shared/types` and are used by both client and server.
 
-## React Compiler
+## What was done
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **App shell:** `main.tsx` mounts the app; `App.tsx` composes the dashboard. A theme context and toggle support light/dark UI.
+- **Data layer:** Queries in `src/queries/` call the analytics API: `useEconomicHistoryQuery` for `/analytics/economic-history` and `useEconomicLatestQuery` for `/analytics/economic-latest`. `useDashboardData` and `useWorldTopologyQuery` coordinate data and topology for the dashboard and map.
+- **Dashboard:** `GlobalDevelopmentDashboard` wires controls and charts. `DashboardControls` (filters, metric pills, country combobox) and `NarrowByFilters` / `BubbleChartFilters` let users filter by region, income, and metrics. Metric definitions live in `constants/metrics.ts` (aligned with `shared` types).
+- **Charts:** Visx-based line chart (with legend and tooltip), bar chart, scatter (Gapminder-style), and `GeoMercatorChart` for the world map. Skeletons are used while data or topology are loading.
+- **Config:** `config.ts` sets `API_BASE_URL` from `import.meta.env.VITE_API_BASE_URL`; leave it unset for same-origin (production behind the same server), or set it to `http://localhost:3000` when running the Vite dev server against the local API.
 
-## Expanding the ESLint configuration
+## Scripts
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- `npm run dev` – Start Vite dev server (default port 5173).
+- `npm run build` – Run `tsc -b` and `vite build`; output is `dist/` for the server to serve.
+- `npm run preview` – Serve the production build locally.
+- `npm run lint` – Run ESLint.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Environment
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- `VITE_API_BASE_URL` – Optional. Base URL for the analytics API. Omit when the client is served from the same origin as the API; set to `http://localhost:3000` when using the Vite dev server with the backend on port 3000.
