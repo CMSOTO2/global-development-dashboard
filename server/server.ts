@@ -1,9 +1,11 @@
+/// <reference types="@fastify/static" />
 import Fastify from "fastify";
 import path from "path";
 import { fileURLToPath } from "url";
 import Database from "better-sqlite3";
-import { analyticsRoutes } from "./routes/analytics";
 import cors from "@fastify/cors";
+import fastifyStatic from "@fastify/static";
+import { analyticsRoutes } from "./routes/analytics";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -44,6 +46,14 @@ async function buildServer() {
     credentials: true,
   });
   server.register(analyticsRoutes, { prefix: "/analytics" });
+
+  const clientDist = path.join(__dirname, "..", "client", "dist");
+  await server.register(fastifyStatic, {
+    root: clientDist,
+  });
+  server.setNotFoundHandler(async (_request, reply) => {
+    return reply.sendFile("index.html", clientDist);
+  });
 
   server.addHook("onClose", (instance, done) => {
     db.close();
