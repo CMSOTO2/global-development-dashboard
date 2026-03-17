@@ -21,6 +21,7 @@ For per-package details, setup, and scripts:
 
 - [client/README.md](client/README.md) — frontend stack, structure, and scripts
 - [server/README.md](server/README.md) — backend stack, routes, and environment
+- [data/README.md](data/README.md) — data pipeline, inputs, and how to run the notebook
 
 ---
 
@@ -31,7 +32,7 @@ global-development-dashboard/
 ├── client/          # React dashboard (see client/README.md)
 ├── server/          # Fastify API + static serve (see server/README.md)
 ├── db/              # SQLite schema and dev database
-├── data/            # Raw data and notebooks (cleaning pipeline)
+├── data/            # Raw data and notebooks (see data/README.md)
 ├── shared/          # Shared TypeScript types
 └── README.md
 ```
@@ -40,7 +41,7 @@ global-development-dashboard/
 
 ## Running the project
 
-1. **Database:** Ensure `db/dev.sqlite` exists and matches `db/schema.sql` (run migrations or load data as needed).
+1. **Database:** Ensure `db/dev.sqlite` exists and matches `db/schema.sql`. To populate it from the data pipeline, see [data/README.md](data/README.md).
 2. **Server:** From `server/`, run `npm install` and `npm run dev`. API and (if built) client are served at `http://localhost:3000`.
 3. **Client (dev):** From `client/`, run `npm install` and `npm run dev`. Set `VITE_API_BASE_URL=http://localhost:3000` if the API runs on port 3000. Build with `npm run build`; the output in `client/dist/` is what the server serves in production.
 
