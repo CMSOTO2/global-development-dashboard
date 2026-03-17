@@ -4,6 +4,8 @@ export interface EconomicHistoryData {
   inflation: number;
   life_expectancy: number;
   poverty: number | null;
+  population?: number;
+  population_growth?: number;
 }
 
 export interface EconomicHistory {

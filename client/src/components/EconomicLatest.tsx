@@ -8,7 +8,12 @@ function toBarData(
   items: EconomicLatestType[],
   valueKey: keyof Pick<
     EconomicLatestType,
-    "gdp_growth" | "inflation" | "life_expectancy" | "poverty"
+    | "gdp_growth"
+    | "inflation"
+    | "life_expectancy"
+    | "poverty"
+    | "population"
+    | "population_growth"
   >,
 ) {
   return items.map((item) => ({
@@ -59,6 +64,14 @@ export const EconomicLatest = () => {
     () => (data ? toBarData(data, "life_expectancy") : []),
     [data],
   );
+  const populationBarData = useMemo(
+    () => (data ? toBarData(data, "population") : []),
+    [data],
+  );
+  const populationGrowthBarData = useMemo(
+    () => (data ? toBarData(data, "population_growth") : []),
+    [data],
+  );
   const regionBarData = useMemo(
     () => (data ? toRegionBarData(data) : []),
     [data],
@@ -66,6 +79,12 @@ export const EconomicLatest = () => {
 
   const pctFormat = useCallback((n: number) => `${n.toFixed(1)}%`, []);
   const intFormat = useCallback((n: number) => String(Math.round(n)), []);
+  const populationFormat = useCallback((n: number) => {
+    if (n >= 1e9) return `${(n / 1e9).toFixed(1)}B`;
+    if (n >= 1e6) return `${(n / 1e6).toFixed(1)}M`;
+    if (n >= 1e3) return `${(n / 1e3).toFixed(1)}K`;
+    return String(Math.round(n));
+  }, []);
 
   if (isLoading)
     return (
@@ -155,6 +174,26 @@ export const EconomicLatest = () => {
               title="Avg. GDP growth by region (%)"
               valueFormat={pctFormat}
               color="#f59e0b"
+            />
+          </div>
+        </section>
+
+        {/* Population & Population growth */}
+        <section className="grid gap-6 sm:gap-8 md:grid-cols-2 mb-8 min-w-0">
+          <div className="min-h-[280px] w-full min-w-0">
+            <VisxBarChart
+              data={populationBarData}
+              title="Population"
+              valueFormat={populationFormat}
+              color="#06b6d4"
+            />
+          </div>
+          <div className="min-h-[280px] w-full min-w-0">
+            <VisxBarChart
+              data={populationGrowthBarData}
+              title="Population growth (%)"
+              valueFormat={pctFormat}
+              color="#ec4899"
             />
           </div>
         </section>

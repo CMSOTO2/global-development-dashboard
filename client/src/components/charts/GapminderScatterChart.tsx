@@ -166,6 +166,24 @@ const InnerGapminderScatter = memo(function InnerGapminderScatter({
                 <div>GDP Growth: {tooltipData.gdp_growth?.toFixed(1)}%</div>
                 <div>Life Expectancy: {tooltipData.life_expectancy?.toFixed(0)} yrs</div>
                 <div>Poverty: {tooltipData.poverty != null ? `${tooltipData.poverty.toFixed(1)}%` : "—"}</div>
+                <div>
+                  Population:{" "}
+                  {tooltipData.population != null && Number.isFinite(tooltipData.population)
+                    ? tooltipData.population >= 1e9
+                      ? `${(tooltipData.population / 1e9).toFixed(1)}B`
+                      : tooltipData.population >= 1e6
+                        ? `${(tooltipData.population / 1e6).toFixed(1)}M`
+                        : tooltipData.population >= 1e3
+                          ? `${(tooltipData.population / 1e3).toFixed(1)}K`
+                          : Math.round(tooltipData.population)
+                    : "—"}
+                </div>
+                <div>
+                  Population growth:{" "}
+                  {tooltipData.population_growth != null && Number.isFinite(tooltipData.population_growth)
+                    ? `${tooltipData.population_growth.toFixed(1)}%`
+                    : "—"}
+                </div>
                 <div>Region: {tooltipData.region}</div>
               </div>
             </div>,

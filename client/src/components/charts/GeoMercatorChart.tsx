@@ -40,7 +40,12 @@ interface FeatureShape {
 
 type MapMetric = keyof Pick<
   EconomicHistoryData,
-  "gdp_growth" | "poverty" | "inflation" | "life_expectancy"
+  | "gdp_growth"
+  | "poverty"
+  | "inflation"
+  | "life_expectancy"
+  | "population"
+  | "population_growth"
 >;
 
 const MAP_METRICS: { value: MapMetric; label: string }[] = [
@@ -48,10 +53,18 @@ const MAP_METRICS: { value: MapMetric; label: string }[] = [
   { value: "poverty", label: "Poverty" },
   { value: "inflation", label: "Inflation" },
   { value: "life_expectancy", label: "Life expectancy" },
+  { value: "population", label: "Population" },
+  { value: "population_growth", label: "Population growth" },
 ];
 
 function formatMetricValue(metric: MapMetric, value: number): string {
   if (metric === "life_expectancy") return `${Math.round(value)} yrs`;
+  if (metric === "population") {
+    if (value >= 1e9) return `${(value / 1e9).toFixed(1)}B`;
+    if (value >= 1e6) return `${(value / 1e6).toFixed(1)}M`;
+    if (value >= 1e3) return `${(value / 1e3).toFixed(1)}K`;
+    return String(Math.round(value));
+  }
   return `${value.toFixed(1)}%`;
 }
 
@@ -162,7 +175,7 @@ const InnerGeoMercator = memo(function InnerGeoMercator({
 
   const centerX = width / 2;
   const centerY = height / 2;
-  const scale = (width / 630) * 100;
+  const scale = (width / 630) * 88;
   const translate: [number, number] = [centerX, centerY + 50];
 
   const bg = dark ? BACKGROUND_DARK : BACKGROUND;
@@ -348,6 +361,26 @@ const InnerGeoMercator = memo(function InnerGeoMercator({
                     Poverty:{" "}
                     {selectedYearData.poverty != null
                       ? `${selectedYearData.poverty.toFixed(1)}%`
+                      : "—"}
+                  </div>
+                  <div>
+                    Population:{" "}
+                    {selectedYearData.population != null &&
+                    Number.isFinite(selectedYearData.population)
+                      ? selectedYearData.population >= 1e9
+                        ? `${(selectedYearData.population / 1e9).toFixed(1)}B`
+                        : selectedYearData.population >= 1e6
+                          ? `${(selectedYearData.population / 1e6).toFixed(1)}M`
+                          : selectedYearData.population >= 1e3
+                            ? `${(selectedYearData.population / 1e3).toFixed(1)}K`
+                            : Math.round(selectedYearData.population)
+                      : "—"}
+                  </div>
+                  <div>
+                    Population growth:{" "}
+                    {selectedYearData.population_growth != null &&
+                    Number.isFinite(selectedYearData.population_growth)
+                      ? `${selectedYearData.population_growth.toFixed(1)}%`
                       : "—"}
                   </div>
                 </div>

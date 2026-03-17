@@ -24,7 +24,9 @@ export async function analyticsRoutes(server: FastifyInstance) {
               'gdp_growth', gdp_growth,
               'inflation', inflation,
               'life_expectancy', life_expectancy,
-              'poverty', poverty
+              'poverty', poverty,
+              'population', population,
+              'population_growth', population_growth
             )
           ) AS data
         FROM (

@@ -11,6 +11,8 @@ CREATE TABLE economic_history (
   poverty FLOAT
   latitude FLOAT,
   longitude FLOAT
+  population INT,
+  population_growth FLOAT,
 );
 
 CREATE TABLE economic_latest (
@@ -26,4 +28,6 @@ CREATE TABLE economic_latest (
   poverty FLOAT 
   latitude FLOAT,
   longitude FLOAT
+  population INT,
+  population_growth FLOAT,
 );
