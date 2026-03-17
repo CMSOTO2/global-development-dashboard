@@ -4,6 +4,8 @@ export interface EconomicHistoryData {
   inflation: number;
   life_expectancy: number;
   poverty: number | null;
+  population?: number;
+  population_growth?: number;
 }
 
 export interface EconomicHistory {
@@ -11,6 +13,8 @@ export interface EconomicHistory {
   country_code: string;
   region: string;
   income: string;
+  latitude: number;
+  longitude: number;
   data: EconomicHistoryData[];
 }
 
@@ -19,4 +23,6 @@ export interface EconomicLatest extends EconomicHistoryData {
   country_code: string;
   region: string;
   income: string;
+  latitude: number;
+  longitude: number;
 }

@@ -12,33 +12,25 @@ export async function analyticsRoutes(server: FastifyInstance) {
 
       const rows = (await server.db.query(`
         SELECT
-          country,
           country_code,
-          region,
-          income,
+          MAX(country) AS country,
+          MAX(region) AS region,
+          MAX(income) AS income,
+          MAX(latitude) AS latitude,
+          MAX(longitude) AS longitude,
           json_group_array(
             json_object(
               'year', year,
               'gdp_growth', gdp_growth,
               'inflation', inflation,
               'life_expectancy', life_expectancy,
-              'poverty', poverty
+              'poverty', poverty,
+              'population', population,
+              'population_growth', population_growth
             )
           ) AS data
         FROM (
-          SELECT
-            country_code,
-            year,
-            MAX(country) AS country,
-            MAX(region) AS region,
-            MAX(income) AS income,
-            MAX(gdp_growth) AS gdp_growth,
-            MAX(inflation) AS inflation,
-            MAX(life_expectancy) AS life_expectancy,
-            MAX(poverty) AS poverty
-          FROM economic_history
-          GROUP BY country_code, year
-          ORDER BY country_code, year
+          SELECT * FROM economic_history ORDER BY country_code, year
         )
         GROUP BY country_code
       `)) as EconomicHistoryRow[];
@@ -48,6 +40,8 @@ export async function analyticsRoutes(server: FastifyInstance) {
         country_code: row.country_code,
         region: row.region,
         income: row.income,
+        latitude: row.latitude,
+        longitude: row.longitude,
         data: JSON.parse(row.data) as EconomicHistoryData[],
       }));
 
