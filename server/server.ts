@@ -42,7 +42,11 @@ async function buildServer() {
   server.decorate("db", dbWrapper);
 
   server.register(cors, {
-    origin: ["http://localhost:5173", "http://localhost:3000"],
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "https://global-development-dashboard-production.up.railway.app",
+    ],
     credentials: true,
   });
   server.register(analyticsRoutes, { prefix: "/analytics" });
