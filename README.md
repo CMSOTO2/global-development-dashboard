@@ -1,3 +1,5 @@
+Link to app: https://global-development-dashboard-production.up.railway.app/
+
 # Global Development Dashboard
 
 A full-stack data analytics platform for exploring global development indicators: GDP growth, inflation, life expectancy, poverty, and population. Raw economic data is processed in a data-science pipeline, stored in SQLite, and served via a REST API; a React dashboard consumes the API and visualizes the data with interactive charts and a world map.
