@@ -8,7 +8,7 @@ CREATE TABLE economic_history (
   gdp_growth FLOAT,
   inflation FLOAT,
   life_expectancy FLOAT,
-  poverty FLOAT
+  poverty FLOAT,
   latitude FLOAT,
   longitude FLOAT
   population INT,
